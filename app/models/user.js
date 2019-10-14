@@ -10,7 +10,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  token: String
+  token: String,
+  role: {
+    type: String,
+    default: 'member'
+  },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Video'
+  }]
 }, {
   timestamps: true,
   toObject: {
