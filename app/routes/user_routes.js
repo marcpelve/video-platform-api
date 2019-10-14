@@ -11,11 +11,14 @@ const bcryptSaltRounds = 10
 
 // pull in error types and the logic to handle them and set status codes
 const errors = require('../../lib/custom_errors')
+const customErrors = require('../../lib/custom_errors')
+const handle404 = customErrors.handle404
 
 const BadParamsError = errors.BadParamsError
 const BadCredentialsError = errors.BadCredentialsError
 
 const User = require('../models/user')
+const Video = require('../models/video')
 
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
@@ -24,6 +27,49 @@ const requireToken = passport.authenticate('bearer', { session: false })
 
 // instantiate a router (mini app that only handles routes)
 const router = express.Router()
+
+// FAVORITE
+// GET /favorites
+router.get('/favorites', requireToken, (req, res, next) => {
+  // finds user and then returns list of favorites for that user
+  User.findById(req.user._id)
+    .then(user => {
+      res.status(200).json({ user: { favorites: user.favorites } })
+    })
+    .catch(next)
+})
+
+// FAVORITE
+// POST /favorites/add/5a7db6c74d55bc51bdf39793
+router.post('/favorites/add/:id', requireToken, (req, res, next) => {
+  // req.params.id will be set based on the `:id` in the route
+  let user
+
+  // finds user and then saves user to variable
+  User.findById(req.user._id)
+    .then(result => {
+      user = result
+    })
+    .catch(next)
+
+  // finds video in paramaters and saves it to saved user favorites if it
+  // doesn't exist, if it does it will remove (toggling the specific movie)
+  Video.findById(req.params.id)
+    .then(handle404)
+    // if `findById` is succesful, respond with 200 and "video" JSON
+    .then(video => {
+      if (user.favorites.includes(req.params.id)) {
+        user.favorites.splice(user.favorites.indexOf(req.params.id), 1)
+        user.save()
+      } else {
+        user.favorites.push(req.params.id)
+        user.save()
+      }
+    })
+    .then(() => res.sendStatus(204))
+    // if an error occurs, pass it to the handler
+    .catch(next)
+})
 
 // SIGN UP
 // POST /sign-up
