@@ -33,6 +33,7 @@ const router = express.Router()
 router.get('/favorites', requireToken, (req, res, next) => {
   // finds user and then returns list of favorites for that user
   User.findById(req.user._id)
+    .populate('favorites')
     .then(user => {
       res.status(200).json({ user: { favorites: user.favorites } })
     })
