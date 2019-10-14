@@ -14,7 +14,6 @@ const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 // we'll use this function to send 401 when a user tries to modify a resource
 // that's owned by someone else
-const requireOwnership = customErrors.requireOwnership
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
 // { video: { title: '', text: 'foo' } } -> { video: { text: 'foo' } }
@@ -77,9 +76,6 @@ router.patch('/videos/:id', removeBlanks, (req, res, next) => {
   Video.findById(req.params.id)
     .then(handle404)
     .then(video => {
-      // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the owner
-      requireOwnership(req, video)
       // pass the result of Mongoose's `.update` to the next `.then`
       return video.updateOne(req.body.video)
     })
