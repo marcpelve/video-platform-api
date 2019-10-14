@@ -31,8 +31,6 @@ const router = express.Router()
 // GET /videos
 router.get('/videos', (req, res, next) => {
   Video.find()
-    .populate('owner')
-    .populate('favorites')
     .then(videos => {
       // `videos` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -47,10 +45,9 @@ router.get('/videos', (req, res, next) => {
 
 // SHOW
 // GET /videos/5a7db6c74d55bc51bdf39793
-router.get('/videos/:id', requireToken, (req, res, next) => {
+router.get('/videos/:id', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   Video.findById(req.params.id)
-    .populate('owner')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "video" JSON
     .then(video => res.status(200).json({ video: video.toObject() }))
@@ -60,9 +57,7 @@ router.get('/videos/:id', requireToken, (req, res, next) => {
 
 // CREATE
 // POST /videos
-router.post('/videos', requireToken, (req, res, next) => {
-  // set owner of new video to be current user
-  req.body.video.owner = req.user.id
+router.post('/videos', (req, res, next) => {
   Video.create(req.body.video)
     // respond to succesful `create` with status 201 and JSON of new "video"
     .then(video => {
@@ -76,11 +71,9 @@ router.post('/videos', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /videos/5a7db6c74d55bc51bdf39793
-router.patch('/videos/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/videos/:id', removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.video.owner
-
   Video.findById(req.params.id)
     .then(handle404)
     .then(video => {
@@ -111,9 +104,6 @@ router.delete('/videos/:id', requireToken, (req, res, next) => {
     Video.findById(req.params.id)
       .then(handle404)
       .then(video => {
-        // throw an error if current user doesn't own `video`
-        requireOwnership(req, video)
-        // delete the video ONLY IF the above didn't throw
         video.deleteOne()
       })
       // send back 204 and no content if the deletion succeeded

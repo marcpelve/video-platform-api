@@ -5,6 +5,10 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  year: {
+    type: Number,
+    required: true
+  },
   description: {
     type: String,
     required: true
@@ -21,12 +25,7 @@ const videoSchema = new mongoose.Schema({
     type: String,
     enum: ['Action', 'Adventure', 'Comedy', 'Crime', 'Drama', 'Fantasy', 'Historical', 'Horror', 'Political', 'Romance', 'Science fiction', 'Thriller', 'Western'],
     required: true
-  }],
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  }
+  }]
 }, {
   timestamps: true
 })
