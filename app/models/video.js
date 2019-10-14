@@ -17,11 +17,11 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+  category: [{
+    type: String,
+    enum: ['Action', 'Adventure', 'Comedy', 'Crime', 'Drama', 'Fantasy', 'Historical', 'Horror', 'Political', 'Romance', 'Science fiction', 'Thriller', 'Western'],
     required: true
-  },
+  }],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
