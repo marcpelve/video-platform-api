@@ -87,26 +87,25 @@ router.patch('/videos/:id', removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /videos/5a7db6c74d55bc51bdf39793
-router.delete('/videos/:id', requireToken, (req, res, next) => {
-  if (req.user.role === 'admin') {
-    Video.findById(req.params.id)
-      .then(handle404)
-      .then(video => {
-        video.deleteOne()
-      })
-      .then(() => res.sendStatus(204))
-      .catch(next)
-  } else {
-    Video.findById(req.params.id)
-      .then(handle404)
-      .then(video => {
-        video.deleteOne()
-      })
-      // send back 204 and no content if the deletion succeeded
-      .then(() => res.sendStatus(204))
-      // if an error occurs, pass it to the handler
-      .catch(next)
-  }
+router.delete('/videos/:id', (req, res, next) => {
+  // if (req.user.role === 'admin') {
+  //   Video.findById(req.params.id)
+  //     .then(handle404)
+  //     .then(video => {
+  //       video.deleteOne()
+  //     })
+  //     .then(() => res.sendStatus(204))
+  //     .catch(next)
+  // }
+  Video.findById(req.params.id)
+    .then(handle404)
+    .then(video => {
+      video.deleteOne()
+    })
+    // send back 204 and no content if the deletion succeeded
+    .then(() => res.sendStatus(204))
+    // if an error occurs, pass it to the handler
+    .catch(next)
 })
 
 module.exports = router
