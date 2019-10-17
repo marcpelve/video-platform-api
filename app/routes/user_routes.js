@@ -40,6 +40,17 @@ router.get('/favorites', requireToken, (req, res, next) => {
     .catch(next)
 })
 
+router.get('/favorites/:id', requireToken, (req, res, next) => {
+  let favorite
+  User.findById(req.user._id)
+    .then(user => {
+      if (user.favorites.includes(req.params.id)) favorite = true
+      else favorite = false
+      res.status(200).json({ user: { favorited: favorite } })
+    })
+    .catch(next)
+})
+
 // FAVORITE
 // POST /favorites/add/5a7db6c74d55bc51bdf39793
 router.post('/favorites/add/:id', requireToken, (req, res, next) => {
